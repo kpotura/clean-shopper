@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Optimizer — Claude Code</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:              #0d1117;
+      --surface:         #161b22;
+      --surface-2:       #21262d;
+      --border:          #30363d;
+      --text:            #e6edf3;
+      --muted:           #7d8590;
+      --accent:          #58a6ff;
+      --strong:          #3fb950;
+      --needs-work:      #d29922;
+      --critical:        #f85149;
+      --strong-bg:       rgba(63,185,80,0.06);
+      --needs-work-bg:   rgba(210,153,34,0.06);
+      --critical-bg:     rgba(248,81,73,0.06);
+      --strong-border:   rgba(63,185,80,0.25);
+      --needs-work-border: rgba(210,153,34,0.25);
+      --critical-border: rgba(248,81,73,0.25);
+      --mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+      --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Header ─────────────────────────────── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .header-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .api-key-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .api-label {
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    #apiKey {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 6px 10px;
+      width: 260px;
+      transition: border-color 0.15s;
+    }
+    #apiKey:focus { outline: none; border-color: var(--accent); }
+    #apiKey::placeholder { color: var(--muted); }
+
+    /* ── Main ────────────────────────────────── */
+    main {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 32px 24px 96px;
+    }
+
+    /* ── Input ───────────────────────────────── */
+    .field-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .round-badge {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 8px;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    #promptInput {
+      width: 100%;
+      min-height: 180px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.75;
+      padding: 16px;
+      resize: vertical;
+      transition: border-color 0.15s;
+    }
+    #promptInput:focus { outline: none; border-color: var(--accent); }
+    #promptInput::placeholder { color: var(--muted); }
+
+    .input-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .char-count {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    #analyzeBtn {
+      background: var(--accent);
+      color: #0d1117;
+      border: none;
+      border-radius: 6px;
+      padding: 9px 22px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    #analyzeBtn:hover:not(:disabled) { opacity: 0.88; }
+    #analyzeBtn:active:not(:disabled) { transform: scale(0.98); }
+    #analyzeBtn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* ── Loading / Error ─────────────────────── */
+    #loading {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #errorBox {
+      display: none;
+      background: var(--critical-bg);
+      border: 1px solid var(--critical-border);
+      border-radius: 6px;
+      color: var(--critical);
+      font-size: 13px;
+      padding: 12px 16px;
+      margin-top: 12px;
+    }
+
+    /* ── Section divider ─────────────────────── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 32px 0 16px;
+    }
+
+    .divider-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .divider-meta {
+      font-size: 12px;
+      font-family: var(--mono);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* ── Dimension cards ─────────────────────── */
+    .dimensions-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .dim-card {
+      border-radius: 8px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-left: 3px solid transparent;
+      background: var(--surface);
+    }
+    .dim-card.strong   { background: var(--strong-bg);    border-color: var(--strong-border);    border-left-color: var(--strong);    }
+    .dim-card.needs-work { background: var(--needs-work-bg); border-color: var(--needs-work-border); border-left-color: var(--needs-work); }
+    .dim-card.critical { background: var(--critical-bg);  border-color: var(--critical-border);  border-left-color: var(--critical);  }
+
+    .dim-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 5px;
+    }
+
+    .dim-name {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .rating-pill {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .rating-pill.strong    { background: rgba(63,185,80,0.15);  color: var(--strong);    }
+    .rating-pill.needs-work { background: rgba(210,153,34,0.15); color: var(--needs-work); }
+    .rating-pill.critical  { background: rgba(248,81,73,0.15);  color: var(--critical);  }
+
+    .dim-diagnosis {
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .dim-fix {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .fix-tag {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      margin-right: 6px;
+    }
+
+    /* ── Revised prompt ──────────────────────── */
+    .revised-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .revised-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+
+    .revised-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .revised-actions { display: flex; gap: 8px; }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 5px;
+      padding: 5px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+      font-family: var(--sans);
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    .btn-accent {
+      background: var(--accent);
+      border: none;
+      color: #0d1117;
+      border-radius: 5px;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      font-family: var(--sans);
+    }
+    .btn-accent:hover { opacity: 0.85; }
+
+    #revisedText {
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.75;
+      padding: 16px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    /* ── Changes / Gaps lists ────────────────── */
+    .numbered-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      list-style: none;
+    }
+
+    .numbered-list li {
+      display: flex;
+      gap: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+
+    .list-num {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 18px;
+      padding-top: 1px;
+    }
+
+    .gaps-list li {
+      border-left: 3px solid var(--needs-work);
+      color: var(--muted);
+    }
+    .gaps-list .list-num { color: var(--needs-work); }
+
+    /* ── Iteration progress ──────────────────── */
+    .iteration-history {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .iter-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .iter-label {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      min-width: 58px;
+    }
+
+    .mini-dots {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .mdot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .mdot.strong    { background: var(--strong);    }
+    .mdot.needs-work { background: var(--needs-work); }
+    .mdot.critical  { background: var(--critical);  }
+
+    .bar-track {
+      flex: 1;
+      height: 5px;
+      background: var(--surface-2);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--strong));
+      transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .iter-pct {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text);
+      min-width: 36px;
+      text-align: right;
+    }
+
+    /* ── Results wrapper ─────────────────────── */
+    #results { display: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-title">
+    <span class="logo">Prompt Optimizer</span>
+    <span class="header-sub">Claude Code prompt analysis</span>
+  </div>
+  <div class="api-key-wrap">
+    <span class="api-label">API key</span>
+    <input type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off" />
+  </div>
+</header>
+
+<main>
+
+  <!-- Input -->
+  <div style="margin-bottom: 4px;">
+    <div class="field-label">
+      Your Prompt
+      <span class="round-badge" id="roundBadge">Round 1</span>
+    </div>
+    <textarea id="promptInput" placeholder="Paste the Claude Code prompt you want to optimize..."></textarea>
+    <div class="input-footer">
+      <span class="char-count" id="charCount">0 characters</span>
+      <button id="analyzeBtn" onclick="analyze()">Analyze Prompt →</button>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div id="errorBox"></div>
+
+  <!-- Loading -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <span>Analyzing across seven dimensions...</span>
+  </div>
+
+  <!-- Results -->
+  <div id="results">
+
+    <!-- Dimension analysis -->
+    <div class="divider">
+      <span class="divider-label">Dimension Analysis</span>
+      <div class="divider-line"></div>
+      <span class="divider-meta" id="scoreMeta"></span>
+    </div>
+    <div class="dimensions-grid" id="dimensionsGrid"></div>
+
+    <!-- Revised prompt -->
+    <div class="divider">
+      <span class="divider-label">Revised Prompt</span>
+      <div class="divider-line"></div>
+    </div>
+    <div class="revised-box">
+      <div class="revised-header">
+        <span class="revised-label">Optimized version</span>
+        <div class="revised-actions">
+          <button class="btn-ghost" id="copyBtn" onclick="copyRevised()">Copy</button>
+          <button class="btn-accent" onclick="useAsNext()">Use as Next Round →</button>
+        </div>
+      </div>
+      <div id="revisedText"></div>
+    </div>
+
+    <!-- What changed -->
+    <div class="divider">
+      <span class="divider-label">What Changed</span>
+      <div class="divider-line"></div>
+    </div>
+    <ul class="numbered-list" id="changesList"></ul>
+
+    <!-- Gaps -->
+    <div id="gapsSection" style="display:none;">
+      <div class="divider">
+        <span class="divider-label">Gaps</span>
+        <div class="divider-line"></div>
+      </div>
+      <ul class="numbered-list gaps-list" id="gapsList"></ul>
+    </div>
+
+    <!-- Iteration progress -->
+    <div id="progressSection" style="display:none;">
+      <div class="divider">
+        <span class="divider-label">Iteration Progress</span>
+        <div class="divider-line"></div>
+      </div>
+      <div class="iteration-history" id="iterationHistory"></div>
+    </div>
+
+  </div><!-- /results -->
+</main>
+
+<script>
+  // ── State ────────────────────────────────────────
+  let history = [];
+  let currentRound = 1;
+  let currentRevised = '';
+
+  // ── Init ─────────────────────────────────────────
+  const apiKeyEl    = document.getElementById('apiKey');
+  const promptEl    = document.getElementById('promptInput');
+  const charCountEl = document.getElementById('charCount');
+
+  const saved = localStorage.getItem('po_api_key');
+  if (saved) apiKeyEl.value = saved;
+
+  apiKeyEl.addEventListener('change', () => {
+    if (apiKeyEl.value.trim()) localStorage.setItem('po_api_key', apiKeyEl.value.trim());
+  });
+
+  promptEl.addEventListener('input', () => {
+    charCountEl.textContent = `${promptEl.value.length} characters`;
+  });
+
+  // ── Helpers ──────────────────────────────────────
+  function ratingClass(r) {
+    if (r === 'Strong')     return 'strong';
+    if (r === 'Needs Work') return 'needs-work';
+    if (r === 'Critical')   return 'critical';
+    return '';
+  }
+
+  function calcScore(dimensions) {
+    const vals = { Strong: 2, 'Needs Work': 1, Critical: 0 };
+    const sum = dimensions.reduce((acc, d) => acc + (vals[d.rating] ?? 0), 0);
+    return Math.round((sum / (dimensions.length * 2)) * 100);
+  }
+
+  function setLoading(on) {
+    document.getElementById('loading').style.display = on ? 'flex' : 'none';
+    document.getElementById('analyzeBtn').disabled = on;
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('errorBox');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  function clearError() {
+    document.getElementById('errorBox').style.display = 'none';
+  }
+
+  // ── API call ─────────────────────────────────────
+  const SYSTEM = `You are a prompt quality analyst specializing in Claude Code instructions. Analyze the prompt across exactly seven dimensions and return ONLY valid JSON — no markdown, no code fences, no explanation.
+
+Return this exact structure:
+{
+  "dimensions": [
+    { "id": "clarity",         "name": "Clarity",                 "rating": "Strong|Needs Work|Critical", "diagnosis": "...", "fix": "..." },
+    { "id": "context",         "name": "Context",                 "rating": "...", "diagnosis": "...", "fix": "..." },
+    { "id": "scope",           "name": "Scope",                   "rating": "...", "diagnosis": "...", "fix": "..." },
+    { "id": "role_persona",    "name": "Role and Persona",        "rating": "...", "diagnosis": "...", "fix": "..." },
+    { "id": "sequencing",      "name": "Instruction Sequencing",  "rating": "...", "diagnosis": "...", "fix": "..." },
+    { "id": "references",      "name": "Unresolved References",   "rating": "...", "diagnosis": "...", "fix": "..." },
+    { "id": "token_efficiency","name": "Token Efficiency",        "rating": "...", "diagnosis": "...", "fix": "..." }
+  ],
+  "revised_prompt": "Full revised prompt with all issues addressed.",
+  "changes": ["Specific explanation 1.", "Specific explanation 2."],
+  "gaps": []
+}
+
+Rules:
+- rating must be exactly one of: "Strong", "Needs Work", "Critical"
+- If rating is "Strong", set diagnosis to "No issues found." and fix to null
+- Be direct and specific — vague feedback is useless
+- Do not invent information absent from the original prompt
+- Constraints before the task, "do not" language upfront = good sequencing
+- Return ONLY the JSON object
+
+Evaluation criteria:
+1. Clarity: Is the instruction unambiguous? Could it be interpreted multiple ways?
+2. Context: Does Claude Code have what it needs? Files named, conventions stated, scope established?
+3. Scope: Is the task bounded? Any open-ended language that could cause drift?
+4. Role and Persona: Has the instruction established who Claude is? Would a role improve output?
+5. Instruction Sequencing: Are constraints stated BEFORE tasks?
+6. Unresolved References: Any pronouns (it, this, that, the component) without clear antecedents?
+7. Token Efficiency: Is the prompt longer than necessary? Where can it tighten without losing precision?`;
+
+  async function callClaude(apiKey, prompt) {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-opus-4-5',
+        max_tokens: 2048,
+        system: SYSTEM,
+        messages: [{ role: 'user', content: `Analyze this prompt:\n\n${prompt}` }]
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `API error ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data.content[0].text;
+  }
+
+  function parseJSON(text) {
+    const cleaned = text.replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/i, '').trim();
+    try { return JSON.parse(cleaned); }
+    catch { throw new Error('Could not parse the AI response. Try again.'); }
+  }
+
+  // ── Main action ───────────────────────────────────
+  async function analyze() {
+    const prompt = promptEl.value.trim();
+    const apiKey = apiKeyEl.value.trim();
+
+    if (!prompt) { showError('Paste a prompt to analyze.'); return; }
+    if (!apiKey)  { showError('Enter your Anthropic API key in the header.'); return; }
+
+    clearError();
+    setLoading(true);
+    document.getElementById('results').style.display = 'none';
+
+    try {
+      const raw  = await callClaude(apiKey, prompt);
+      const data = parseJSON(raw);
+      const score = calcScore(data.dimensions);
+
+      history.push({ round: currentRound, score, dimensions: data.dimensions, revised: data.revised_prompt });
+      currentRevised = data.revised_prompt;
+
+      render(data, score);
+    } catch (err) {
+      showError(err.message || 'Something went wrong. Check your API key and try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ── Render ────────────────────────────────────────
+  function render(data, score) {
+    // Score summary
+    const nStrong = data.dimensions.filter(d => d.rating === 'Strong').length;
+    const nCrit   = data.dimensions.filter(d => d.rating === 'Critical').length;
+    document.getElementById('scoreMeta').textContent =
+      `${score}%  ·  ${nStrong} strong  ·  ${nCrit} critical`;
+
+    // Dimensions
+    document.getElementById('dimensionsGrid').innerHTML = data.dimensions.map(d => {
+      const cls = ratingClass(d.rating);
+      return `
+        <div class="dim-card ${cls}">
+          <div class="dim-header">
+            <span class="dim-name">${d.name}</span>
+            <span class="rating-pill ${cls}">${d.rating}</span>
+          </div>
+          <div class="dim-diagnosis">${d.diagnosis}</div>
+          ${d.fix ? `<div class="dim-fix"><span class="fix-tag">Fix →</span>${d.fix}</div>` : ''}
+        </div>
+      `;
+    }).join('');
+
+    // Revised prompt
+    document.getElementById('revisedText').textContent = data.revised_prompt;
+
+    // Changes
+    document.getElementById('changesList').innerHTML = data.changes.map((c, i) => `
+      <li><span class="list-num">${i + 1}.</span><span>${c}</span></li>
+    `).join('');
+
+    // Gaps
+    const gapsSection = document.getElementById('gapsSection');
+    if (data.gaps?.length) {
+      document.getElementById('gapsList').innerHTML = data.gaps.map((g, i) => `
+        <li><span class="list-num">${i + 1}.</span><span>${g}</span></li>
+      `).join('');
+      gapsSection.style.display = 'block';
+    } else {
+      gapsSection.style.display = 'none';
+    }
+
+    // Iteration history
+    const progressSection = document.getElementById('progressSection');
+    if (history.length >= 1) {
+      document.getElementById('iterationHistory').innerHTML = history.map(iter => {
+        const dots = iter.dimensions.map(d =>
+          `<div class="mdot ${ratingClass(d.rating)}" title="${d.name}: ${d.rating}"></div>`
+        ).join('');
+        return `
+          <div class="iter-row">
+            <span class="iter-label">Round ${iter.round}</span>
+            <div class="mini-dots">${dots}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${iter.score}%"></div></div>
+            <span class="iter-pct">${iter.score}%</span>
+          </div>
+        `;
+      }).join('');
+      progressSection.style.display = 'block';
+    }
+
+    document.getElementById('results').style.display = 'block';
+  }
+
+  // ── Actions ───────────────────────────────────────
+  function copyRevised() {
+    navigator.clipboard.writeText(currentRevised).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 1600);
+    });
+  }
+
+  function useAsNext() {
+    currentRound++;
+    document.getElementById('roundBadge').textContent = `Round ${currentRound}`;
+    promptEl.value = currentRevised;
+    charCountEl.textContent = `${currentRevised.length} characters`;
+    document.getElementById('results').style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    promptEl.focus();
+  }
+</script>
+</body>
+</html>
