@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './lib/supabase'
+import { signOut } from './lib/api/auth'
 import NavBar from './components/NavBar'
 import BrowsePage from './features/browse/BrowsePage'
 import SearchPage from './features/search/SearchPage'
@@ -33,10 +34,15 @@ export default function App() {
       : <SignUpPage onNavigateToSignIn={() => setAuthPage('signin')} />
   }
 
+  const handleSignOut = async () => {
+    await signOut()
+    setAuthPage('signin')
+  }
+
   // Authenticated — show main app
   return (
     <div className="min-h-screen bg-neutral-50">
-      <NavBar activePage={page} onNavigate={setPage} />
+      <NavBar activePage={page} onNavigate={setPage} onSignOut={handleSignOut} />
       {page === 'browse' && <BrowsePage />}
       {page === 'search' && <SearchPage />}
     </div>

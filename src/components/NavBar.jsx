@@ -3,7 +3,7 @@ const NAV_LINKS = [
   { label: 'Search', route: 'search' },
 ]
 
-export default function NavBar({ activePage, onNavigate }) {
+export default function NavBar({ activePage, onNavigate, onSignOut }) {
   return (
     <nav className="w-full bg-white border-b border-neutral-200 shadow-sm px-xl py-md flex items-center justify-between">
       <button
@@ -27,6 +27,14 @@ export default function NavBar({ activePage, onNavigate }) {
             </button>
           </li>
         ))}
+        <li>
+          <button
+            onClick={onSignOut}
+            className="text-body text-neutral-600 hover:text-neutral-900 transition-colors"
+          >
+            Sign out
+          </button>
+        </li>
       </ul>
     </nav>
   )
