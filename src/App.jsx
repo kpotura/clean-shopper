@@ -1,5 +1,5 @@
-import BrowsePage from './features/browse/BrowsePage'
+import SearchPage from './features/search/SearchPage'
 
 export default function App() {
-  return <BrowsePage />
+  return <SearchPage />
 }
