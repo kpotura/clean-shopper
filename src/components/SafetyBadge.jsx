@@ -10,6 +10,7 @@ const sizeClasses = {
 }
 
 export default function SafetyBadge({ verdict, size = 'md' }) {
+  if (!verdictConfig[verdict]) return null
   const { label, classes } = verdictConfig[verdict]
 
   return (
