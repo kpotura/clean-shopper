@@ -9,6 +9,8 @@ This file is referenced by CLAUDE.md and read by Claude Code at the start of eve
 
 All visual values must use Tailwind token classes from `tailwind.config.js`. Never hardcode hex colors, pixel sizes, or spacing values.
 
+All components must meet **WCAG 2.2 Level AA**. Before shipping any new component verify: text contrast ≥4.5:1, non-text UI contrast ≥3:1, keyboard operable, focus ring visible on every interactive element, and every control has an accessible name. See `/memory/feedback_wcag_compliance.md` for the full checklist.
+
 ---
 
 ## Components
@@ -96,6 +98,7 @@ disabled: opacity-50 cursor-not-allowed
 | `error` | `string` | No | Error message; triggers error state when present |
 | `disabled` | `boolean` | No | Disables input interaction |
 | `type` | `string` | No (default: `'text'`) | HTML input type |
+| `showToggle` | `boolean` | No | When `true` and `type="password"`, renders a show/hide eye icon button inside the input |
 
 **Visual Structure**
 
@@ -311,7 +314,40 @@ Hover (when `onClick` provided): `hover:bg-secondary-dark` (unselected) | `hover
 
 ---
 
-### 8. EmptyState
+### 8. Checkbox
+
+**Purpose:** A labeled checkbox for binary user preferences and form options.
+
+**Props**
+| Prop | Type | Required | Description |
+|---|---|---|---|
+| `id` | `string` | Yes | Links label to input for accessibility |
+| `label` | `string` | Yes | Visible label text rendered beside the checkbox |
+| `checked` | `boolean` | Yes | Controlled checked state |
+| `onChange` | `(checked: boolean) => void` | Yes | Called with the new boolean value on change |
+| `disabled` | `boolean` | No | Disables interaction and applies disabled styles |
+
+**Visual Structure**
+
+Container: `flex items-center gap-sm`
+
+Input: `w-4 h-4 accent-primary cursor-pointer`
+
+Label: `text-small text-neutral-600 cursor-pointer select-none`
+
+**States**
+- **Default:** Unchecked, `text-neutral-600` label
+- **Checked:** Browser-native checkmark tinted via `accent-primary`
+- **Disabled:** `cursor-not-allowed` on both input and label; label in `text-neutral-400`
+
+**Usage Rules**
+- Always provide a visible `label` — do not use a bare checkbox without context.
+- Use for single binary options (e.g., "Remember me", "Agree to terms"). For multi-select filter groups, use `CategoryTag` instead.
+- Manage `checked` state in the parent component.
+
+---
+
+### 9. EmptyState
 
 **Purpose:** A centered, informative placeholder shown when a surface has no content to display, with an optional call-to-action.
 

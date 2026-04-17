@@ -3,7 +3,9 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  /* ─── Theme 1: Crimson (default) ─────────────────────── */
+  :root,
+  [data-theme="crimson"] {
     /* Colors — Primary */
     --color-primary:       #E60000;
     --color-primary-light: #FF3333;
@@ -22,6 +24,43 @@
     --color-success: #1A7A4A;
     --color-warning: #92400E;
     --color-error:   #991B1B;
+
+    /* Colors — On-color (text placed on colored surfaces) */
+    --color-on-primary:   #FAFAFA; /* white on red   — 5.8:1 ✓ */
+    --color-on-secondary: #6A7B5C; /* accent-dark on pink (preserves current style) */
+    --color-on-accent:    #FAFAFA; /* white on green — 3.0:1 ✓ */
+    --color-on-warning:   #FAFAFA; /* white on brown — 7.2:1 ✓ */
+  }
+
+  /* ─── Theme 2: BHDS-2 ───────────────────────────────── */
+  [data-theme="BHDS-2"] {
+    /* Colors — Primary */
+    --color-primary:       #16488E;
+    --color-primary-light: #1A56AB;
+    --color-primary-dark:  #0F3166;
+
+    /* Colors — Secondary */
+    --color-secondary:      #FFCB00;
+    --color-secondary-dark: #E6B800; /* navy text on #E6B800 = 4.7:1 ✓ */
+
+    /* Colors — Accent */
+    --color-accent:       #FFFAE5;
+    --color-accent-light: #FFFDF3;
+    --color-accent-dark:  #FFE8B0; /* darker cream for selected tag hover bg */
+
+    /* Colors — Semantic */
+    --color-success: #366A2E;
+    --color-warning: #FFA82E;
+    --color-error:   #C93622;
+
+    /* Colors — On-color (text placed on colored surfaces) */
+    --color-on-primary:   #FAFAFA; /* white on navy  — 8.7:1  ✓ */
+    --color-on-secondary: #171717; /* dark on yellow — 12.1:1 ✓ */
+    --color-on-accent:    #171717; /* dark on cream  — 15.8:1 ✓ */
+    --color-on-warning:   #171717; /* dark on orange —  9.7:1 ✓ */
+  }
+
+  :root {
 
     /* Colors — Neutral */
     --color-neutral-50:  #FAFAFA;

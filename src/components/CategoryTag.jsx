@@ -2,8 +2,8 @@ export default function CategoryTag({ label, selected = false, onClick }) {
   const base = 'inline-flex items-center px-md py-xs rounded-full text-small font-semibold transition-colors'
 
   const variant = selected
-    ? 'bg-accent text-neutral-50'
-    : 'bg-secondary text-accent-dark'
+    ? 'bg-accent text-on-accent'
+    : 'bg-secondary text-on-secondary'
 
   const hover = onClick
     ? selected

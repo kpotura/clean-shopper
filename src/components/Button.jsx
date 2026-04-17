@@ -14,7 +14,7 @@ function Spinner() {
 }
 
 const variantClasses = {
-  primary:   'bg-primary text-neutral-50 hover:bg-primary-light active:bg-primary-dark',
+  primary:   'bg-primary text-on-primary hover:bg-primary-light active:bg-primary-dark',
   secondary: 'bg-secondary text-primary border border-primary hover:bg-secondary-dark active:bg-secondary-dark active:border-primary-dark active:text-primary-dark',
   ghost:     'bg-transparent text-primary hover:bg-secondary active:bg-secondary-dark',
 }

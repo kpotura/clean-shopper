@@ -1,6 +1,6 @@
 const verdictConfig = {
   clean:   { label: 'Clean',       classes: 'bg-success text-neutral-50' },
-  caution: { label: 'Use Caution', classes: 'bg-warning text-neutral-50' },
+  caution: { label: 'Use Caution', classes: 'bg-warning text-on-warning' },
   avoid:   { label: 'Avoid',       classes: 'bg-error text-neutral-50'   },
 }
 

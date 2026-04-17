@@ -1,13 +1,25 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import InputField from '../../components/InputField'
 import Button from '../../components/Button'
+import Checkbox from '../../components/Checkbox'
 import { signIn } from '../../lib/api/auth'
+
+const REMEMBER_ME_KEY = 'clean_shopper_remembered_email'
 
 export default function SignInPage({ onNavigateToSignUp }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem(REMEMBER_ME_KEY)
+    if (savedEmail) {
+      setEmail(savedEmail)
+      setRememberMe(true)
+    }
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -16,6 +28,11 @@ export default function SignInPage({ onNavigateToSignUp }) {
 
     try {
       await signIn(email, password)
+      if (rememberMe) {
+        localStorage.setItem(REMEMBER_ME_KEY, email)
+      } else {
+        localStorage.removeItem(REMEMBER_ME_KEY)
+      }
       // Auth state change in App.jsx handles redirect automatically
     } catch (err) {
       setError(err.message)
@@ -54,6 +71,15 @@ export default function SignInPage({ onNavigateToSignUp }) {
             value={password}
             onChange={setPassword}
             placeholder="Your password"
+            disabled={loading}
+            showToggle
+          />
+
+          <Checkbox
+            id="remember-me"
+            label="Remember me"
+            checked={rememberMe}
+            onChange={setRememberMe}
             disabled={loading}
           />
 

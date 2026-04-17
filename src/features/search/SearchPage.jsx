@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import SearchBar from '../../components/SearchBar'
 import ProductCard from '../../components/ProductCard'
 import EmptyState from '../../components/EmptyState'
 import { searchProducts } from '../../lib/api/products'
+import { fetchSavedProductIds, saveProduct, unsaveProduct } from '../../lib/api/saved-products'
 
 function MagnifyingGlassIcon() {
   return (
@@ -29,6 +30,12 @@ export default function SearchPage() {
   const [lastQuery, setLastQuery] = useState('')
   const [savedIds, setSavedIds] = useState(new Set())
 
+  useEffect(() => {
+    fetchSavedProductIds()
+      .then(setSavedIds)
+      .catch((err) => console.error('fetchSavedProductIds failed:', err.message))
+  }, [])
+
   const handleSearch = async () => {
     const term = query.trim()
     if (!term) return
@@ -48,12 +55,19 @@ export default function SearchPage() {
     }
   }
 
-  const handleSave = (id) => {
+  const handleSave = async (id) => {
+    const isSaved = savedIds.has(id)
+    // Optimistic update
     setSavedIds((prev) => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      isSaved ? next.delete(id) : next.add(id)
       return next
     })
+    try {
+      isSaved ? await unsaveProduct(id) : await saveProduct(id)
+    } catch (err) {
+      console.error('Save failed:', err.message)
+    }
   }
 
   const hasSearched = results !== null

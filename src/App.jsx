@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './lib/supabase'
 import { signOut } from './lib/api/auth'
+import { ThemeProvider } from './lib/theme-context'
 import NavBar from './components/NavBar'
 import BrowsePage from './features/browse/BrowsePage'
 import SearchPage from './features/search/SearchPage'
 import SignInPage from './features/auth/SignInPage'
 import SignUpPage from './features/auth/SignUpPage'
 
-export default function App() {
+function AppShell() {
   const [session, setSession] = useState(undefined)
   const [page, setPage] = useState('browse')
   const [authPage, setAuthPage] = useState('signin')
@@ -46,5 +47,13 @@ export default function App() {
       {page === 'browse' && <BrowsePage />}
       {page === 'search' && <SearchPage />}
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppShell />
+    </ThemeProvider>
   )
 }

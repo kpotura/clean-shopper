@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import ProductCard from '../../components/ProductCard'
 import CategoryTag from '../../components/CategoryTag'
 import { fetchProducts } from '../../lib/api/products'
+import { fetchSavedProductIds, saveProduct, unsaveProduct } from '../../lib/api/saved-products'
 
 const CATEGORIES = ['All', 'Personal Care', 'Home Cleaning', 'Baby Care', 'Kitchen']
 
@@ -17,14 +18,25 @@ export default function BrowsePage() {
       .then(setProducts)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
+
+    fetchSavedProductIds()
+      .then(setSavedIds)
+      .catch((err) => console.error('fetchSavedProductIds failed:', err.message))
   }, [])
 
-  const handleSave = (id) => {
+  const handleSave = async (id) => {
+    const isSaved = savedIds.has(id)
+    // Optimistic update
     setSavedIds((prev) => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      isSaved ? next.delete(id) : next.add(id)
       return next
     })
+    try {
+      isSaved ? await unsaveProduct(id) : await saveProduct(id)
+    } catch (err) {
+      console.error('Save failed:', err.message)
+    }
   }
 
   const filtered = activeCategory === 'All'

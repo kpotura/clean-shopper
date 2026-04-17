@@ -82,6 +82,7 @@ export default function SignUpPage({ onNavigateToSignIn }) {
             placeholder="Choose a password"
             helperText="Must be at least 6 characters."
             disabled={loading}
+            showToggle
           />
 
           {error && (
