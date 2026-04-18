@@ -5,6 +5,7 @@ import { ThemeProvider } from './lib/theme-context'
 import NavBar from './components/NavBar'
 import BrowsePage from './features/browse/BrowsePage'
 import SearchPage from './features/search/SearchPage'
+import FavoritesPage from './features/favorites/FavoritesPage'
 import SignInPage from './features/auth/SignInPage'
 import SignUpPage from './features/auth/SignUpPage'
 
@@ -44,8 +45,9 @@ function AppShell() {
   return (
     <div className="min-h-screen bg-surface-subtle">
       <NavBar activePage={page} onNavigate={setPage} onSignOut={handleSignOut} />
-      {page === 'browse' && <BrowsePage />}
-      {page === 'search' && <SearchPage />}
+      {page === 'browse'     && <BrowsePage />}
+      {page === 'search'     && <SearchPage />}
+      {page === 'favorites'  && <FavoritesPage onNavigate={setPage} />}
     </div>
   )
 }

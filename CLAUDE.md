@@ -38,3 +38,4 @@ Supports user authentication via Supabase Auth. Local state plus Supabase for da
 - Project context: See /docs/project-context.md -- full project intake and design decisions
 - Prompt optimization: Use /prompt-optimizer to evaluate and refine instructions before sending them
 - Tailwind config: See tailwind.config.js for design tokens as Tailwind theme extensions. Always use theme classes, never hardcode values.
+- Favorites feature spec: See /docs/feature-spec-favorites.md — component reuse, new components, design tokens, and acceptance criteria for the Favorites List feature.

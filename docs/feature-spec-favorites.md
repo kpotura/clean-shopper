@@ -12,11 +12,12 @@ Unlike the Shopping List — which is task-oriented and built around purchasing 
 
 **Core user flows:**
 1. **Save** — tap "Save" on any `ProductCard` in Browse or Search; button updates to "Saved ✓".
-2. **Review** — navigate to Library; view all saved products in a filterable, sortable grid.
+2. **Review** — navigate to Favorites; view all saved products in a filterable, sortable grid.
 3. **Filter by category** — tap a `CategoryTag` chip to narrow the grid to one category.
 4. **Sort** — change display order via a `SortControl` (Date Saved, Name A–Z, Verdict).
-5. **Unsave / remove** — tap "Saved ✓" to toggle off, or use the remove action on the Library screen; product leaves the list.
+5. **Unsave / remove** — tap "Saved ✓" to toggle off, or use the remove action on the Favorites screen; product leaves the list.
 6. **Empty state** — when no products are saved, an `EmptyState` prompts the user to browse.
+7. **Share** - tap "Share" at top or bottom of page
 
 ---
 
@@ -24,7 +25,7 @@ Unlike the Shopping List — which is task-oriented and built around purchasing 
 
 | Component | How it is used |
 |---|---|
-| `NavBar` | Top navigation; `activeRoute='library'` |
+| `NavBar` | Top navigation; `activeRoute='favorites'` |
 | `ProductCard` | Renders each saved product; `saved={true}` on all cards; `onSave` wires to the unsave handler |
 | `SafetyBadge` | Rendered inside `ProductCard` as usual; no change needed |
 | `CategoryTag` | Filter bar above the grid; one chip per category present in saved products |
