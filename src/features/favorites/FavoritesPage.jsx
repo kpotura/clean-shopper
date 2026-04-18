@@ -173,7 +173,7 @@ export default function FavoritesPage({ onNavigate }) {
               <p className="text-body text-neutral-600">
                 {products.length === 0
                   ? 'No saved products yet.'
-                  : `${products.length} saved product${products.length === 1 ? '' : 's'}`
+                  : `${sorted.length} saved product${sorted.length === 1 ? '' : 's'}`
                 }
                 {isPlaceholder && (
                   <span className="ml-sm text-small text-neutral-400">(sample data)</span>
