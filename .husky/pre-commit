@@ -1,0 +1,8 @@
+if [ -z "$E2E_EMAIL" ] || [ -z "$E2E_PASSWORD" ]; then
+  echo "⚠️  E2E_EMAIL and E2E_PASSWORD are not set — skipping Playwright tests."
+  echo "    To run tests on commit: E2E_EMAIL=you@example.com E2E_PASSWORD=pass git commit ..."
+  exit 0
+fi
+
+echo "Running Playwright tests..."
+npx playwright test --reporter=list
