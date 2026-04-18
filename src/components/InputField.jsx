@@ -51,7 +51,7 @@ export default function InputField({
           placeholder={placeholder}
           disabled={disabled}
           className={[
-            'w-full py-sm rounded-md border bg-white',
+            'w-full py-sm rounded-md border bg-surface',
             showToggle ? 'pl-md pr-xl' : 'px-md',
             'text-body text-neutral-900 placeholder:text-neutral-400',
             'focus:outline-none focus:ring-2 focus:ring-primary-dark focus:border-primary-dark',

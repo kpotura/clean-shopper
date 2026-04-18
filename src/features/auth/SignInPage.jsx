@@ -43,7 +43,7 @@ export default function SignInPage({ onNavigateToSignUp }) {
 
   return (
     <div className="min-h-screen bg-secondary flex items-center justify-center px-md">
-      <div className="bg-white rounded-lg shadow-md p-2xl w-full max-w-md">
+      <div className="bg-surface rounded-lg shadow-md p-2xl w-full max-w-md">
 
         {/* Header */}
         <div className="flex flex-col gap-sm mb-xl">

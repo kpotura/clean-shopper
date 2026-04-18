@@ -5,18 +5,18 @@ const THEMES = {
   bhds2:   'BHDS-2',
 }
 
-const STORAGE_KEY = 'clean_shopper_theme'
+const THEME_KEY = 'clean_shopper_theme'
 
 const ThemeContext = createContext()
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(
-    () => localStorage.getItem(STORAGE_KEY) || THEMES.crimson
+    () => localStorage.getItem(THEME_KEY) || THEMES.crimson
   )
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
-    localStorage.setItem(STORAGE_KEY, theme)
+    localStorage.setItem(THEME_KEY, theme)
   }, [theme])
 
   const toggleTheme = () => {
@@ -31,7 +31,5 @@ export function ThemeProvider({ children }) {
 }
 
 export function useTheme() {
-  const ctx = useContext(ThemeContext)
-  if (!ctx) throw new Error('useTheme must be used inside ThemeProvider')
-  return ctx
+  return useContext(ThemeContext)
 }

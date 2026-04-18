@@ -42,7 +42,7 @@ function AppShell() {
 
   // Authenticated — show main app
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-surface-subtle">
       <NavBar activePage={page} onNavigate={setPage} onSignOut={handleSignOut} />
       {page === 'browse' && <BrowsePage />}
       {page === 'search' && <SearchPage />}

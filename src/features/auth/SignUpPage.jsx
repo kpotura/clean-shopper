@@ -33,7 +33,7 @@ export default function SignUpPage({ onNavigateToSignIn }) {
   if (confirmed) {
     return (
       <div className="min-h-screen bg-secondary flex items-center justify-center px-md">
-        <div className="bg-white rounded-lg shadow-md p-2xl w-full max-w-md flex flex-col gap-lg text-center">
+        <div className="bg-surface rounded-lg shadow-md p-2xl w-full max-w-md flex flex-col gap-lg text-center">
           <h1 className="text-h2 text-neutral-900">Check your email</h1>
           <p className="text-body text-neutral-600">
             We sent a confirmation link to <span className="font-semibold text-neutral-900">{email}</span>. Click it to activate your account.
@@ -52,7 +52,7 @@ export default function SignUpPage({ onNavigateToSignIn }) {
 
   return (
     <div className="min-h-screen bg-secondary flex items-center justify-center px-md">
-      <div className="bg-white rounded-lg shadow-md p-2xl w-full max-w-md">
+      <div className="bg-surface rounded-lg shadow-md p-2xl w-full max-w-md">
 
         {/* Header */}
         <div className="flex flex-col gap-sm mb-xl">

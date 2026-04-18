@@ -45,7 +45,7 @@ export default function SearchBar({
   return (
     <div
       className={[
-        'flex items-center gap-sm bg-white border rounded-full px-md py-sm shadow-sm transition-all',
+        'flex items-center gap-sm bg-surface border rounded-full px-md py-sm shadow-sm transition-all',
         'focus-within:ring-2 focus-within:ring-primary-dark focus-within:border-primary-dark',
         disabled ? 'bg-neutral-100 border-neutral-200' : 'border-neutral-200',
       ].join(' ')}

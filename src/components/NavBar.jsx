@@ -17,7 +17,7 @@ export default function NavBar({ activePage, onNavigate, onSignOut }) {
   return (
     <>
       {/* Main nav */}
-      <header className="w-full bg-white border-b border-neutral-200 shadow-sm">
+      <header className="w-full bg-surface border-b border-neutral-200 shadow-sm">
         <nav className="px-xl py-md flex items-center justify-between">
           <button
             onClick={() => onNavigate('browse')}
@@ -52,8 +52,8 @@ export default function NavBar({ activePage, onNavigate, onSignOut }) {
         </nav>
       </header>
 
-      {/* Theme toggle — below nav underline, aligned under Sign out */}
-      <div className="px-xl pt-xs flex justify-end">
+      {/* Sub-bar — theme toggle, aligned under Sign out */}
+      <div className="px-xl pt-xs pb-xs flex justify-end items-center gap-md">
         <button
           onClick={toggleTheme}
           aria-label={`Switch to ${meta.nextLabel} theme`}

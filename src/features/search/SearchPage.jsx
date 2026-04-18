@@ -74,7 +74,7 @@ export default function SearchPage() {
   const hasResults = hasSearched && results.length > 0
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-surface-subtle">
       <div className="max-w-[1200px] mx-auto px-xl py-2xl">
 
         {/* Page header */}
