@@ -6,6 +6,8 @@
   /* ─── Theme 1: Crimson (default) ─────────────────────── */
   :root,
   [data-theme="crimson"] {
+    --font-sans: 'Figtree', Arial, sans-serif;
+
     /* Colors — Primary */
     --color-primary:       #E60000;
     --color-primary-light: #FF3333;

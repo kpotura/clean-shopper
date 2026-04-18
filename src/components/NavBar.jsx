@@ -1,13 +1,14 @@
 import { useTheme } from '../lib/theme-context'
 
 const NAV_LINKS = [
-  { label: 'Browse', route: 'browse' },
-  { label: 'Search', route: 'search' },
+  { label: 'Browse',    route: 'browse' },
+  { label: 'Search',    route: 'search' },
+  { label: 'Favorites', route: 'favorites' },
 ]
 
 const THEME_META = {
-  crimson:  { label: 'Crimson', nextLabel: 'BHDS-2',  dot: '#16488E' },
-  'BHDS-2': { label: 'BHDS-2',  nextLabel: 'Crimson', dot: '#E60000' },
+  crimson:  { label: 'Crimson', nextLabel: 'BHDS-2',  dotClass: 'bg-dot-bhds' },
+  'BHDS-2': { label: 'BHDS-2',  nextLabel: 'Crimson', dotClass: 'bg-dot-crimson' },
 }
 
 export default function NavBar({ activePage, onNavigate, onSignOut }) {
@@ -61,8 +62,7 @@ export default function NavBar({ activePage, onNavigate, onSignOut }) {
           className="flex items-center gap-xs text-micro text-neutral-400 hover:text-neutral-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-dark rounded-sm"
         >
           <span
-            className="inline-block w-2 h-2 rounded-full border border-neutral-200 flex-shrink-0"
-            style={{ backgroundColor: meta.dot }}
+            className={`inline-block w-2 h-2 rounded-full border border-neutral-200 flex-shrink-0 ${meta.dotClass}`}
             aria-hidden="true"
           />
           {meta.nextLabel} theme

@@ -26,8 +26,8 @@ export default {
         'on-accent':    'var(--color-on-accent)',
         'on-warning':   'var(--color-on-warning)',
         neutral: {
-          50:  '#FAFAFA',
-          100: '#F5F5F5',
+          50:  'var(--color-neutral-50)',
+          100: 'var(--color-neutral-100)',
           200: 'var(--color-neutral-200)',
           400: 'var(--color-neutral-400)',
           600: 'var(--color-neutral-600)',
@@ -35,6 +35,8 @@ export default {
         },
         surface:          'var(--color-surface)',
         'surface-subtle': 'var(--color-surface-subtle)',
+        'dot-bhds':    '#16488E',
+        'dot-crimson': '#E60000',
       },
       fontFamily: {
         sans: ['var(--font-sans)'],
